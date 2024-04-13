@@ -1,10 +1,11 @@
 const express = require("express");
-const otp = require("otp-generator");
 
 const dotenv = require("dotenv");
 dotenv.config();
 
 const sendEmail = require("./email");
+const otpService = require("./otpServices");
+const redis = require("./redis");
 
 const app = express();
 
@@ -23,14 +24,7 @@ app.post("/otp", async (req, res) => {
     return res.status(400).json({ message: "Email is required" });
   }
 
-  const otpCode = otp.generate(6, {
-    lowerCaseAlphabets: false,
-    upperCaseAlphabets: false,
-    specialChars: false,
-  });
-
-  // Store otp and email in database
-  otpStore[email] = otpCode;
+  const otpCode = await otpService.generate(email, 6);
 
   try {
     await sendEmail(
@@ -55,12 +49,13 @@ app.post("/verify-otp", async (req, res) => {
   }
 
   // Check if the OTP is valid
-  if (!otpStore[email] || otpStore[email] !== otp) {
+  const otpCode = await redis.get(email);
+  if (!otpCode || otpCode !== otp) {
     return res.status(400).json({ message: "Invalid OTP" });
   }
 
-  // Delete the OTP from the store
-  delete otpStore[email];
+  // Delete the OTP from the redis
+  await redis.del(email);
 
   return res.json({ message: "OTP verified successfully" });
 });
