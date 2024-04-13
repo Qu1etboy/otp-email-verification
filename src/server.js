@@ -1,6 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 import sendEmail from "./email/index.js";
 import otpService from "./otpServices.js";
