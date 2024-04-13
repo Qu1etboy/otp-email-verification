@@ -1,9 +1,9 @@
-const otp = require("otp-generator");
-const redis = require("./redis");
+import otp from "otp-generator";
+import redis from "./redis.js";
 
 const EXPIRY_TIME = 60 * 5; // 5 minutes
 
-const generate = async (email, length) => {
+export const generate = async (email, length) => {
   const otpCode = otp.generate(length, {
     lowerCaseAlphabets: false,
     upperCaseAlphabets: false,
@@ -15,4 +15,4 @@ const generate = async (email, length) => {
   return otpCode;
 };
 
-module.exports = { generate };
+export default { generate };

@@ -1,11 +1,10 @@
-const express = require("express");
-
-const dotenv = require("dotenv");
+import express from "express";
+import dotenv from "dotenv";
 dotenv.config();
 
-const sendEmail = require("./email");
-const otpService = require("./otpServices");
-const redis = require("./redis");
+import sendEmail from "./email/index.js";
+import otpService from "./otpServices.js";
+import redis from "./redis.js";
 
 const app = express();
 
@@ -13,9 +12,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 4000;
-
-// Store OTPs with email as a key in memory
-const otpStore = {};
 
 app.post("/otp", async (req, res) => {
   const { email } = req.body;
